@@ -42,7 +42,6 @@ function criarElementoTarefa(tarefa){
             paragrafo.textContent = novaDescricao
             tarefa.descricao = novaDescricao
             atualizarTarefas()
-            //evento.preventDefault()
             return li
         
         }
@@ -91,7 +90,8 @@ btnCancelarTarefa.addEventListener('click',()=>{
 formAdicionarTarefa.addEventListener('submit', (evento)=>{
         evento.preventDefault()
         const tarefa = {
-            descricao: textarea.value
+            descricao: textarea.value,
+            completa: false
         }
         tarefas.push(tarefa)
         const elementoTarefa = criarElementoTarefa(tarefa)
@@ -99,7 +99,7 @@ formAdicionarTarefa.addEventListener('submit', (evento)=>{
         textarea.value = ''
         formAdicionarTarefa.classList.toggle('hidden')
         atualizarTarefas()
-})
+});
 
 tarefas.forEach(tarefa => {
     const elementoTarefa = criarElementoTarefa(tarefa)
@@ -118,18 +118,42 @@ document.addEventListener('FocoFinalizado', () =>{
 })
 
 const removerTarefas = (somenteCompletas) =>{
-    // const seletor = somenteCompletas? '.app__section-task-list-item-complete' : 'app_section-task-list-item'
-    let seletor = '.app__section-task-list-item-complete'
-    if(somenteCompletas){
-        seletor = '.app__section-task-list-item-complete'
-    }
+    let seletor = somenteCompletas
+    ? '.app__section-task-list-item-complete' 
+    : '.app__section-task-list-item'
 
     document.querySelectorAll(seletor).forEach(elemento =>{
         elemento.remove()
     })
-    tarefas = somenteCompletas ? tarefas.filter(tarefa => !tarefa.completa) : []
+    tarefas = somenteCompletas 
+    ? tarefas.filter(tarefa => !tarefa.completa) : []
+
     atualizarTarefas()
 }
+
+atualizarTarefas()
+//criarElementoTarefa ()
+
+textarea.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault()
+
+        const tarefa = {
+            descricao: textarea.value.trim(),
+            completa: false
+        }
+
+        if (tarefa.descricao !== "") {
+            tarefas.push(tarefa)
+            const elementoTarefa = criarElementoTarefa(tarefa)
+            ulTarefas.append(elementoTarefa)
+            textarea.value = ''
+            formAdicionarTarefa.classList.add('hidden')
+            atualizarTarefas()
+        }
+    }
+})
+
 
 btnRemoverConcluidas.onclick = ()=> removerTarefas(true)
 btnLimparTodas.onclick = () => removerTarefas(false)
